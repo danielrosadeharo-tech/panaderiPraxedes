@@ -193,13 +193,13 @@
       return;
     }
     container.innerHTML = maquinas.map(m => `
-      <div class="card">
+      <div class="card card-clickable" onclick="app.verMaquina('${m.id}')">
         <div class="card-header">
           <h3>${escapeHtml(m.nombre)}</h3>
         </div>
         <div class="card-actions">
-          <button class="btn btn-sm" onclick="app.editMaquina('${m.id}')">✏️ Editar</button>
-          <button class="btn btn-sm btn-danger" onclick="app.deleteMaquina('${m.id}')">🗑️ Eliminar</button>
+          <button class="btn btn-sm" onclick="event.stopPropagation(); app.editMaquina('${m.id}')">✏️ Editar</button>
+          <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); app.deleteMaquina('${m.id}')">🗑️ Eliminar</button>
         </div>
       </div>
     `).join('');
@@ -297,11 +297,13 @@
     }).join('');
   }
 
+  let docsCache = [];
   function loadDocs() {
     db.collection('documentacion').orderBy('fechaSubida', 'desc').onSnapshot((snap) => {
-      const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      renderDocs(data);
-      $('#stat-docs').textContent = data.length;
+      docsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderDocs(docsCache);
+      $('#stat-docs').textContent = docsCache.length;
+      refreshDetalleIfOpen();
     }, (err) => { console.error('Error cargando documentos:', err); showToast('Error cargando documentos', 'error'); });
   }
 
@@ -395,6 +397,7 @@
       recambiosCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       renderRecambios(recambiosCache, $('#filtro-maquina-inv').value);
       $('#stat-recambios').textContent = recambiosCache.length;
+      refreshDetalleIfOpen();
     }, (err) => { console.error('Error cargando recambios:', err); showToast('Error cargando recambios', 'error'); });
   }
 
@@ -524,6 +527,7 @@
       renderHistorial(historialCache);
       $('#stat-cambios').textContent = historialCache.length;
       renderUltimosCambios(historialCache.slice(0, 5));
+      refreshDetalleIfOpen();
     }, (err) => { console.error('Error cargando historial:', err); showToast('Error cargando historial', 'error'); });
   }
 
@@ -585,6 +589,150 @@
       showToast('Error al eliminar: ' + err.message, 'error');
     }
   };
+
+  // =============================================
+  // DETALLE DE MÁQUINA
+  // =============================================
+  let currentMaquinaId = null;
+
+  // Tabs
+  $$('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      $$('.tab').forEach(t => t.classList.remove('active'));
+      $$('.tab-content').forEach(tc => tc.classList.remove('active'));
+      tab.classList.add('active');
+      $(`#${tab.dataset.tab}`).classList.add('active');
+    });
+  });
+
+  window.app.verMaquina = (id) => {
+    currentMaquinaId = id;
+    const maquina = maquinasCache.find(m => m.id === id);
+    if (!maquina) return;
+
+    $('#detalle-maquina-nombre').textContent = maquina.nombre;
+    $('#page-title').textContent = maquina.nombre;
+
+    // Show detail section, hide others
+    sections.forEach(s => s.classList.remove('active'));
+    $('#section-maquina-detalle').classList.add('active');
+    navLinks.forEach(l => l.classList.remove('active'));
+
+    // Reset to first tab
+    $$('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'tab-docs'));
+    $$('.tab-content').forEach(tc => tc.classList.toggle('active', tc.id === 'tab-docs'));
+
+    renderDetalleDocs(id);
+    renderDetalleRecambios(id);
+    renderDetalleHistorial(id);
+  };
+
+  function renderDetalleDocs(maquinaId) {
+    const filtered = docsCache.filter(d => d.idMaqui === maquinaId);
+    const container = $('#detalle-docs');
+    if (!filtered.length) {
+      container.innerHTML = '<p class="empty-msg">No hay documentos para esta máquina.</p>';
+      return;
+    }
+    container.innerHTML = filtered.map(d => `
+      <div class="card">
+        <div class="card-header"><h3>${escapeHtml(d.nombreDoc)}</h3></div>
+        <p class="card-meta">Subido: ${formatDate(d.fechaSubida)}</p>
+        <div class="card-actions">
+          <a href="${escapeHtml(d.urlArchivo)}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary">📥 Abrir</a>
+          <button class="btn btn-sm btn-danger" onclick="app.deleteDoc('${d.id}')">🗑️</button>
+        </div>
+      </div>`).join('');
+  }
+
+  function renderDetalleRecambios(maquinaId) {
+    const filtered = recambiosCache.filter(r => r.idMaqui === maquinaId);
+    const container = $('#detalle-recambios');
+    if (!filtered.length) {
+      container.innerHTML = '<p class="empty-msg">No hay recambios para esta máquina.</p>';
+      return;
+    }
+    container.innerHTML = `
+      <table>
+        <thead><tr><th>Pieza</th><th>Stock</th><th>Proveedor</th><th>Acciones</th></tr></thead>
+        <tbody>
+          ${filtered.map(r => `
+            <tr>
+              <td><strong>${escapeHtml(r.pieza)}</strong></td>
+              <td>
+                <div class="stock-controls">
+                  <button class="btn-icon" onclick="app.updateStock('${r.id}', -1)">➖</button>
+                  <span class="stock-value">${r.stock}</span>
+                  <button class="btn-icon" onclick="app.updateStock('${r.id}', 1)">➕</button>
+                </div>
+              </td>
+              <td>${escapeHtml(r.proveedor || '—')}</td>
+              <td>
+                <button class="btn btn-sm" onclick="app.editRecambio('${r.id}')">✏️</button>
+                <button class="btn btn-sm btn-danger" onclick="app.deleteRecambio('${r.id}')">🗑️</button>
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  }
+
+  function renderDetalleHistorial(maquinaId) {
+    const filtered = historialCache.filter(c => c.idMaqui === maquinaId);
+    const container = $('#detalle-historial');
+    if (!filtered.length) {
+      container.innerHTML = '<p class="empty-msg">No hay sustituciones para esta máquina.</p>';
+      return;
+    }
+    container.innerHTML = `
+      <table>
+        <thead><tr><th>Fecha</th><th>Componente</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody>
+          ${filtered.map(c => {
+            const estado = getEstado(c);
+            return `
+            <tr>
+              <td>${formatDate(c.fechaCambio)}</td>
+              <td>${escapeHtml(c.componente)}</td>
+              <td><span class="card-badge ${estado.clase}">${estado.texto}</span></td>
+              <td><button class="btn btn-sm btn-danger" onclick="app.deleteCambio('${c.id}')">🗑️</button></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`;
+  }
+
+  // Back button
+  $('#btn-volver-maquinas').addEventListener('click', () => {
+    currentMaquinaId = null;
+    navigateTo('maquinas');
+  });
+
+  // Add buttons from detail view
+  $('#btn-add-doc-detalle').addEventListener('click', () => {
+    $('#form-doc').reset();
+    $('#doc-maquina').value = currentMaquinaId;
+    openModal('modal-doc');
+  });
+  $('#btn-add-recambio-detalle').addEventListener('click', () => {
+    $('#form-recambio').reset();
+    $('#recambio-id').value = '';
+    $('#recambio-maquina').value = currentMaquinaId;
+    openModal('modal-recambio');
+  });
+  $('#btn-add-cambio-detalle').addEventListener('click', () => {
+    $('#form-cambio').reset();
+    $('#cambio-maquina').value = currentMaquinaId;
+    openModal('modal-cambio');
+  });
+
+  // Refresh detail view when data changes
+  function refreshDetalleIfOpen() {
+    if (currentMaquinaId && $('#section-maquina-detalle').classList.contains('active')) {
+      renderDetalleDocs(currentMaquinaId);
+      renderDetalleRecambios(currentMaquinaId);
+      renderDetalleHistorial(currentMaquinaId);
+    }
+  }
 
   // ---- Init ----
   // Data loading is triggered by auth.onAuthStateChanged when user logs in

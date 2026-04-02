@@ -140,6 +140,52 @@
       </div>
     </section>
 
+    <!-- ===== SECCIÓN: DETALLE MÁQUINA ===== -->
+    <section id="section-maquina-detalle" class="section">
+      <div class="section-header">
+        <button class="btn" id="btn-volver-maquinas">← Volver</button>
+        <h2 id="detalle-maquina-nombre"></h2>
+        <div></div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" data-tab="tab-docs">📄 Documentos</button>
+        <button class="tab" data-tab="tab-recambios">🔩 Recambios</button>
+        <button class="tab" data-tab="tab-historial">🔧 Historial</button>
+      </div>
+
+      <div id="tab-docs" class="tab-content active">
+        <div class="section-header" style="margin-top:1rem">
+          <h3>Documentos</h3>
+          <button class="btn btn-primary btn-sm" id="btn-add-doc-detalle">+ Añadir</button>
+        </div>
+        <div id="detalle-docs" class="cards-grid">
+          <p class="empty-msg">No hay documentos.</p>
+        </div>
+      </div>
+
+      <div id="tab-recambios" class="tab-content">
+        <div class="section-header" style="margin-top:1rem">
+          <h3>Recambios</h3>
+          <button class="btn btn-primary btn-sm" id="btn-add-recambio-detalle">+ Añadir</button>
+        </div>
+        <div id="detalle-recambios" class="table-wrapper">
+          <p class="empty-msg">No hay recambios.</p>
+        </div>
+      </div>
+
+      <div id="tab-historial" class="tab-content">
+        <div class="section-header" style="margin-top:1rem">
+          <h3>Historial de Sustituciones</h3>
+          <button class="btn btn-primary btn-sm" id="btn-add-cambio-detalle">+ Registrar</button>
+        </div>
+        <div id="detalle-historial" class="table-wrapper">
+          <p class="empty-msg">No hay sustituciones.</p>
+        </div>
+      </div>
+    </section>
+
     <!-- ===== SECCIÓN: DOCUMENTACIÓN ===== -->
     <section id="section-documentacion" class="section">
       <div class="section-header">
