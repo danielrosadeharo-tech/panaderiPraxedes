@@ -197,7 +197,6 @@
         <div class="card-header">
           <h3>${escapeHtml(m.nombre)}</h3>
         </div>
-        <p class="card-meta">Instalada: ${formatDate(m.fechaInstalacion)}</p>
         <div class="card-actions">
           <button class="btn btn-sm" onclick="app.editMaquina('${m.id}')">✏️ Editar</button>
           <button class="btn btn-sm btn-danger" onclick="app.deleteMaquina('${m.id}')">🗑️ Eliminar</button>
@@ -230,8 +229,7 @@
     e.preventDefault();
     const id = $('#maquina-id').value;
     const data = {
-      nombre:           $('#maquina-nombre').value.trim(),
-      fechaInstalacion: $('#maquina-fecha').value,
+      nombre: $('#maquina-nombre').value.trim(),
     };
     try {
       if (id) {
@@ -257,7 +255,6 @@
     const m = doc.data();
     $('#maquina-id').value = id;
     $('#maquina-nombre').value = m.nombre;
-    $('#maquina-fecha').value = m.fechaInstalacion || '';
     $('#modal-maquina-title').textContent = 'Editar Máquina';
     openModal('modal-maquina');
   };
