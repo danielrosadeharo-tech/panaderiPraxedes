@@ -342,6 +342,8 @@ tbody tr:hover { background: rgba(245,222,179,.15); }
   font-weight: 600;
   font-size: 1rem;
 }
+.stock-value.stock-danger { color: #d32f2f; }
+.stock-value.stock-warning { color: #e65100; }
 
 /* ---------- Empty State ---------- */
 .empty-msg {

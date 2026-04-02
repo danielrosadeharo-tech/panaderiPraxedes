@@ -379,7 +379,7 @@
                 <td>
                   <div class="stock-controls">
                     <button class="btn-icon" onclick="app.updateStock('${r.id}', -1)" title="Restar">➖</button>
-                    <span class="stock-value">${r.stock}</span>
+                    <span class="stock-value${r.stock === 0 ? ' stock-danger' : r.stock === 1 ? ' stock-warning' : ''}">${r.stock}</span>
                     <button class="btn-icon" onclick="app.updateStock('${r.id}', 1)" title="Sumar">➕</button>
                   </div>
                 </td>
@@ -668,7 +668,7 @@
               <td>
                 <div class="stock-controls">
                   <button class="btn-icon" onclick="app.updateStock('${r.id}', -1)">➖</button>
-                  <span class="stock-value">${r.stock}</span>
+                  <span class="stock-value${r.stock === 0 ? ' stock-danger' : r.stock === 1 ? ' stock-warning' : ''}">${r.stock}</span>
                   <button class="btn-icon" onclick="app.updateStock('${r.id}', 1)">➕</button>
                 </div>
               </td>
