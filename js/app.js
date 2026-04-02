@@ -163,7 +163,8 @@
       const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       renderMaquinas(data);
       $('#stat-maquinas').textContent = data.length;
-    }, () => {
+    }, (err) => {
+      console.error('Error cargando máquinas:', err);
       showToast('Error cargando máquinas', 'error');
     });
   }
@@ -192,8 +193,9 @@
         showToast('Máquina registrada', 'success');
       }
       closeModal('modal-maquina');
-    } catch {
-      showToast('Error al guardar', 'error');
+    } catch (err) {
+      console.error('Error al guardar máquina:', err);
+      showToast('Error al guardar: ' + err.message, 'error');
     }
   });
 
@@ -216,8 +218,9 @@
     try {
       await db.collection('maquinas').doc(id).delete();
       showToast('Máquina eliminada', 'success');
-    } catch {
-      showToast('Error al eliminar', 'error');
+    } catch (err) {
+      console.error('Error al eliminar máquina:', err);
+      showToast('Error al eliminar: ' + err.message, 'error');
     }
   };
 
@@ -253,7 +256,7 @@
       const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       renderDocs(data);
       $('#stat-docs').textContent = data.length;
-    }, () => showToast('Error cargando documentos', 'error'));
+    }, (err) => { console.error('Error cargando documentos:', err); showToast('Error cargando documentos', 'error'); });
   }
 
   $('#btn-add-doc').addEventListener('click', () => {
@@ -285,8 +288,9 @@
       });
       closeModal('modal-doc');
       showToast('Documento subido correctamente', 'success');
-    } catch {
-      showToast('Error al subir documento', 'error');
+    } catch (err) {
+      console.error('Error al subir documento:', err);
+      showToast('Error al subir: ' + err.message, 'error');
     }
   });
 
@@ -295,8 +299,9 @@
     try {
       await db.collection('documentacion').doc(id).delete();
       showToast('Documento eliminado', 'success');
-    } catch {
-      showToast('Error al eliminar', 'error');
+    } catch (err) {
+      console.error('Error al eliminar documento:', err);
+      showToast('Error al eliminar: ' + err.message, 'error');
     }
   };
 
@@ -353,7 +358,7 @@
       recambiosCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       renderRecambios(recambiosCache, $('#filtro-maquina-inv').value);
       $('#stat-recambios').textContent = recambiosCache.length;
-    }, () => showToast('Error cargando recambios', 'error'));
+    }, (err) => { console.error('Error cargando recambios:', err); showToast('Error cargando recambios', 'error'); });
   }
 
   $('#filtro-maquina-inv').addEventListener('change', () => {
@@ -384,8 +389,9 @@
         showToast('Recambio añadido', 'success');
       }
       closeModal('modal-recambio');
-    } catch {
-      showToast('Error al guardar recambio', 'error');
+    } catch (err) {
+      console.error('Error al guardar recambio:', err);
+      showToast('Error al guardar: ' + err.message, 'error');
     }
   });
 
@@ -396,8 +402,9 @@
       if (!doc.exists) return;
       const newStock = Math.max(0, (doc.data().stock || 0) + delta);
       await ref.update({ stock: newStock });
-    } catch {
-      showToast('Error actualizando stock', 'error');
+    } catch (err) {
+      console.error('Error actualizando stock:', err);
+      showToast('Error stock: ' + err.message, 'error');
     }
   };
 
@@ -418,8 +425,9 @@
     try {
       await db.collection('inventario_recambios').doc(id).delete();
       showToast('Recambio eliminado', 'success');
-    } catch {
-      showToast('Error al eliminar', 'error');
+    } catch (err) {
+      console.error('Error al eliminar recambio:', err);
+      showToast('Error al eliminar: ' + err.message, 'error');
     }
   };
 
@@ -470,7 +478,7 @@
       renderHistorial(historialCache, $('#filtro-tipo-hist').value);
       $('#stat-cambios').textContent = historialCache.length;
       renderUltimosCambios(historialCache.slice(0, 5));
-    }, () => showToast('Error cargando historial', 'error'));
+    }, (err) => { console.error('Error cargando historial:', err); showToast('Error cargando historial', 'error'); });
   }
 
   function renderUltimosCambios(cambios) {
@@ -532,8 +540,9 @@
       await db.collection('historial_cambios').add(data);
       closeModal('modal-cambio');
       showToast('Sustitución registrada', 'success');
-    } catch {
-      showToast('Error al registrar', 'error');
+    } catch (err) {
+      console.error('Error al registrar cambio:', err);
+      showToast('Error al registrar: ' + err.message, 'error');
     }
   });
 
@@ -542,8 +551,9 @@
     try {
       await db.collection('historial_cambios').doc(id).delete();
       showToast('Registro eliminado', 'success');
-    } catch {
-      showToast('Error al eliminar', 'error');
+    } catch (err) {
+      console.error('Error al eliminar registro:', err);
+      showToast('Error al eliminar: ' + err.message, 'error');
     }
   };
 
