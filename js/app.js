@@ -347,8 +347,11 @@
   // =============================================
   // INVENTARIO RECAMBIOS
   // =============================================
-  function renderRecambios(recambios, filtro) {
-    const filtered = filtro ? recambios.filter(r => r.idMaqui === filtro) : recambios;
+  function renderRecambios(recambios, filtro, filtroStock) {
+    let filtered = filtro ? recambios.filter(r => r.idMaqui === filtro) : recambios;
+    if (filtroStock === '0') filtered = filtered.filter(r => r.stock === 0);
+    else if (filtroStock === '1-5') filtered = filtered.filter(r => r.stock >= 1 && r.stock <= 5);
+    else if (filtroStock === '6+') filtered = filtered.filter(r => r.stock >= 6);
     const container = $('#lista-recambios');
     if (!filtered.length) {
       container.innerHTML = '<p class="empty-msg">No hay recambios registrados.</p>';
@@ -395,14 +398,17 @@
   function loadRecambios() {
     db.collection('inventario_recambios').orderBy('pieza').onSnapshot((snap) => {
       recambiosCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      renderRecambios(recambiosCache, $('#filtro-maquina-inv').value);
+      renderRecambios(recambiosCache, $('#filtro-maquina-inv').value, $('#filtro-stock').value);
       $('#stat-recambios').textContent = recambiosCache.length;
       refreshDetalleIfOpen();
     }, (err) => { console.error('Error cargando recambios:', err); showToast('Error cargando recambios', 'error'); });
   }
 
   $('#filtro-maquina-inv').addEventListener('change', () => {
-    renderRecambios(recambiosCache, $('#filtro-maquina-inv').value);
+    renderRecambios(recambiosCache, $('#filtro-maquina-inv').value, $('#filtro-stock').value);
+  });
+  $('#filtro-stock').addEventListener('change', () => {
+    renderRecambios(recambiosCache, $('#filtro-maquina-inv').value, $('#filtro-stock').value);
   });
 
   $('#btn-add-recambio').addEventListener('click', () => {
