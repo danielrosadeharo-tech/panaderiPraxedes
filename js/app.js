@@ -443,7 +443,6 @@
             <th>Tipo</th>
             <th>Máquina</th>
             <th>Componente</th>
-            <th>Técnico</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -457,7 +456,6 @@
                 <td><span class="card-badge ${badgeClass(c.tipoMaquina)}">${escapeHtml(c.tipoMaquina)}</span></td>
                 <td>${escapeHtml(maquiNombre)}</td>
                 <td>${escapeHtml(c.componente)}</td>
-                <td>${escapeHtml(c.tecnico)}</td>
                 <td><button class="btn btn-sm btn-danger" onclick="app.deleteCambio('${c.id}')">🗑️</button></td>
               </tr>`;
           }).join('')}
@@ -483,14 +481,13 @@
     }
     container.innerHTML = `
       <table>
-        <thead><tr><th>Fecha</th><th>Tipo</th><th>Componente</th><th>Técnico</th></tr></thead>
+        <thead><tr><th>Fecha</th><th>Tipo</th><th>Componente</th></tr></thead>
         <tbody>
           ${cambios.map(c => `
             <tr>
               <td>${formatDate(c.fechaCambio)}</td>
               <td><span class="card-badge ${badgeClass(c.tipoMaquina)}">${escapeHtml(c.tipoMaquina || '—')}</span></td>
               <td>${escapeHtml(c.componente)}</td>
-              <td>${escapeHtml(c.tecnico)}</td>
             </tr>`).join('')}
         </tbody>
       </table>`;
@@ -527,7 +524,6 @@
       tipoMaquina: $('#cambio-tipo').value,
       idMaqui:     $('#cambio-maquina').value,
       componente:  $('#cambio-componente').value.trim(),
-      tecnico:     $('#cambio-tecnico').value.trim(),
       fechaCambio: $('#cambio-fecha').value,
     };
     try {
