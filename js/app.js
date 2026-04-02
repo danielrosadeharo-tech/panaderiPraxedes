@@ -488,10 +488,9 @@
     return { texto: `Cambiado (${diasRestantes}d)`, clase: 'badge-ok' };
   }
 
-  function renderHistorial(cambios, filtroTipo) {
-    const filtered = filtroTipo ? cambios.filter(c => c.tipoMaquina === filtroTipo) : cambios;
+  function renderHistorial(cambios) {
     const container = $('#lista-historial');
-    if (!filtered.length) {
+    if (!cambios.length) {
       container.innerHTML = '<p class="empty-msg">No hay registros de sustituciones.</p>';
       return;
     }
@@ -500,7 +499,6 @@
         <thead>
           <tr>
             <th>Fecha</th>
-            <th>Tipo</th>
             <th>Máquina</th>
             <th>Componente</th>
             <th>Estado</th>
@@ -508,14 +506,13 @@
           </tr>
         </thead>
         <tbody>
-          ${filtered.map(c => {
+          ${cambios.map(c => {
             const maquina = maquinasCache.find(m => m.id === c.idMaqui);
             const maquiNombre = maquina ? maquina.nombre : '—';
             const estado = getEstado(c);
             return `
               <tr>
                 <td>${formatDate(c.fechaCambio)}</td>
-                <td><span class="card-badge ${badgeClass(c.tipoMaquina)}">${escapeHtml(c.tipoMaquina)}</span></td>
                 <td>${escapeHtml(maquiNombre)}</td>
                 <td>${escapeHtml(c.componente)}</td>
                 <td><span class="card-badge ${estado.clase}">${estado.texto}</span></td>
@@ -530,7 +527,7 @@
   function loadHistorial() {
     db.collection('historial_cambios').orderBy('fechaCambio', 'desc').onSnapshot((snap) => {
       historialCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      renderHistorial(historialCache, $('#filtro-tipo-hist').value);
+      renderHistorial(historialCache);
       $('#stat-cambios').textContent = historialCache.length;
       renderUltimosCambios(historialCache.slice(0, 5));
     }, (err) => { console.error('Error cargando historial:', err); showToast('Error cargando historial', 'error'); });
@@ -544,14 +541,13 @@
     }
     container.innerHTML = `
       <table>
-        <thead><tr><th>Fecha</th><th>Tipo</th><th>Componente</th><th>Estado</th></tr></thead>
+        <thead><tr><th>Fecha</th><th>Componente</th><th>Estado</th></tr></thead>
         <tbody>
           ${cambios.map(c => {
             const estado = getEstado(c);
             return `
             <tr>
               <td>${formatDate(c.fechaCambio)}</td>
-              <td><span class="card-badge ${badgeClass(c.tipoMaquina)}">${escapeHtml(c.tipoMaquina || '—')}</span></td>
               <td>${escapeHtml(c.componente)}</td>
               <td><span class="card-badge ${estado.clase}">${estado.texto}</span></td>
             </tr>`;
@@ -560,25 +556,7 @@
       </table>`;
   }
 
-  $('#filtro-tipo-hist').addEventListener('change', () => {
-    renderHistorial(historialCache, $('#filtro-tipo-hist').value);
-  });
-
-  // Filter machines by type when selecting tipo in cambio modal
-  $('#cambio-tipo').addEventListener('change', () => {
-    const tipo = $('#cambio-tipo').value;
-    const select = $('#cambio-maquina');
-    const firstOpt = select.querySelector('option');
-    select.innerHTML = '';
-    select.appendChild(firstOpt);
-    const filtered = tipo ? maquinasCache.filter(m => m.tipo === tipo) : maquinasCache;
-    filtered.forEach(m => {
-      const opt = document.createElement('option');
-      opt.value = m.id;
-      opt.textContent = m.nombre;
-      select.appendChild(opt);
-    });
-  });
+  // ---- cambio-maquina is populated from maquinasCache via populateMachineSelects ----
 
   $('#btn-add-cambio').addEventListener('click', () => {
     $('#form-cambio').reset();
@@ -588,8 +566,7 @@
   $('#form-cambio').addEventListener('submit', async (e) => {
     e.preventDefault();
     const data = {
-      tipoMaquina: $('#cambio-tipo').value,
-      idMaqui:     $('#cambio-maquina').value,
+      idMaqui:          $('#cambio-maquina').value,
       componente:       $('#cambio-componente').value.trim(),
       fechaCambio:      $('#cambio-fecha').value,
       diasRecordatorio: parseInt($('#cambio-dias').value, 10) || 0,
