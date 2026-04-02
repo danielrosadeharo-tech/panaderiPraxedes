@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panadería Práxedes — Gestión de Maquinaria</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <!-- ========== SIDEBAR ========== -->
+  <nav id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <span class="logo-icon">🍞</span>
+      <h2>Práxedes</h2>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#" class="nav-link active" data-section="dashboard"><span class="nav-icon">📊</span> Panel</a></li>
+      <li><a href="#" class="nav-link" data-section="maquinas"><span class="nav-icon">⚙️</span> Máquinas</a></li>
+      <li><a href="#" class="nav-link" data-section="documentacion"><span class="nav-icon">📄</span> Documentación</a></li>
+      <li><a href="#" class="nav-link" data-section="inventario"><span class="nav-icon">🔩</span> Recambios</a></li>
+      <li><a href="#" class="nav-link" data-section="historial"><span class="nav-icon">🔧</span> Historial</a></li>
+    </ul>
+  </nav>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <main class="main-content">
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <button id="menu-toggle" class="menu-toggle" aria-label="Abrir menú">☰</button>
+      <h1 class="page-title" id="page-title">Panel de Control</h1>
+      <div class="user-area" id="user-area">
+        <button id="btn-login" class="btn btn-sm">Iniciar Sesión</button>
+      </div>
+    </header>
+
+    <!-- ===== SECCIÓN: DASHBOARD ===== -->
+    <section id="section-dashboard" class="section active">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-icon">⚙️</span>
+          <div class="stat-info">
+            <span class="stat-number" id="stat-maquinas">0</span>
+            <span class="stat-label">Máquinas</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">📄</span>
+          <div class="stat-info">
+            <span class="stat-number" id="stat-docs">0</span>
+            <span class="stat-label">Documentos</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">🔩</span>
+          <div class="stat-info">
+            <span class="stat-number" id="stat-recambios">0</span>
+            <span class="stat-label">Recambios</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">🔧</span>
+          <div class="stat-info">
+            <span class="stat-number" id="stat-cambios">0</span>
+            <span class="stat-label">Sustituciones</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Últimas Sustituciones</h3>
+        <div id="ultimos-cambios" class="table-wrapper">
+          <p class="empty-msg">No hay registros aún.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SECCIÓN: MÁQUINAS ===== -->
+    <section id="section-maquinas" class="section">
+      <div class="section-header">
+        <h2>Gestión de Máquinas</h2>
+        <button class="btn btn-primary" id="btn-add-maquina">+ Nueva Máquina</button>
+      </div>
+
+      <!-- Modal: Nueva Máquina -->
+      <div id="modal-maquina" class="modal hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="modal-maquina-title">Nueva Máquina</h3>
+            <button class="modal-close" data-close="modal-maquina">&times;</button>
+          </div>
+          <form id="form-maquina">
+            <input type="hidden" id="maquina-id" />
+            <div class="form-group">
+              <label for="maquina-nombre">Nombre</label>
+              <input type="text" id="maquina-nombre" required placeholder="Ej: Amasadora Industrial X" />
+            </div>
+            <div class="form-group">
+              <label for="maquina-tipo">Tipo</label>
+              <select id="maquina-tipo" required>
+                <option value="">Seleccionar…</option>
+                <option value="Viña">Viña</option>
+                <option value="Pesadora">Pesadora</option>
+                <option value="Otros">Otros</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="maquina-fecha">Fecha de Instalación</label>
+              <input type="date" id="maquina-fecha" required />
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn" data-close="modal-maquina">Cancelar</button>
+              <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div id="lista-maquinas" class="cards-grid">
+        <p class="empty-msg">No hay máquinas registradas.</p>
+      </div>
+    </section>
+
+    <!-- ===== SECCIÓN: DOCUMENTACIÓN ===== -->
+    <section id="section-documentacion" class="section">
+      <div class="section-header">
+        <h2>Documentación</h2>
+        <button class="btn btn-primary" id="btn-add-doc">+ Subir Documento</button>
+      </div>
+
+      <!-- Modal: Subir Documento -->
+      <div id="modal-doc" class="modal hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>Subir Documento</h3>
+            <button class="modal-close" data-close="modal-doc">&times;</button>
+          </div>
+          <form id="form-doc">
+            <div class="form-group">
+              <label for="doc-maquina">Máquina</label>
+              <select id="doc-maquina" required>
+                <option value="">Seleccionar máquina…</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="doc-nombre">Título del Documento</label>
+              <input type="text" id="doc-nombre" required placeholder="Ej: Manual de Usuario - Amasadora X" />
+            </div>
+            <div class="form-group">
+              <label for="doc-archivo">Archivo (PDF / Imagen)</label>
+              <input type="file" id="doc-archivo" accept=".pdf,.png,.jpg,.jpeg,.webp" required />
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn" data-close="modal-doc">Cancelar</button>
+              <button type="submit" class="btn btn-primary">Subir</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div id="lista-docs" class="cards-grid">
+        <p class="empty-msg">No hay documentos subidos.</p>
+      </div>
+    </section>
+
+    <!-- ===== SECCIÓN: INVENTARIO RECAMBIOS ===== -->
+    <section id="section-inventario" class="section">
+      <div class="section-header">
+        <h2>Inventario de Recambios</h2>
+        <button class="btn btn-primary" id="btn-add-recambio">+ Nuevo Recambio</button>
+      </div>
+
+      <!-- Modal: Nuevo Recambio -->
+      <div id="modal-recambio" class="modal hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>Nuevo Recambio</h3>
+            <button class="modal-close" data-close="modal-recambio">&times;</button>
+          </div>
+          <form id="form-recambio">
+            <input type="hidden" id="recambio-id" />
+            <div class="form-group">
+              <label for="recambio-maquina">Máquina</label>
+              <select id="recambio-maquina" required>
+                <option value="">Seleccionar máquina…</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="recambio-pieza">Nombre de la Pieza</label>
+              <input type="text" id="recambio-pieza" required placeholder="Ej: Correa de transmisión" />
+            </div>
+            <div class="form-group">
+              <label for="recambio-stock">Stock</label>
+              <input type="number" id="recambio-stock" required min="0" value="0" />
+            </div>
+            <div class="form-group">
+              <label for="recambio-proveedor">Proveedor</label>
+              <input type="text" id="recambio-proveedor" placeholder="Ej: Repuestos Industriales S.L." />
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn" data-close="modal-recambio">Cancelar</button>
+              <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <label for="filtro-maquina-inv">Filtrar por máquina:</label>
+        <select id="filtro-maquina-inv">
+          <option value="">Todas</option>
+        </select>
+      </div>
+      <div id="lista-recambios" class="table-wrapper">
+        <p class="empty-msg">No hay recambios registrados.</p>
+      </div>
+    </section>
+
+    <!-- ===== SECCIÓN: HISTORIAL CAMBIOS ===== -->
+    <section id="section-historial" class="section">
+      <div class="section-header">
+        <h2>Historial de Sustituciones</h2>
+        <button class="btn btn-primary" id="btn-add-cambio">+ Registrar Cambio</button>
+      </div>
+
+      <!-- Modal: Registrar Cambio -->
+      <div id="modal-cambio" class="modal hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>Registrar Sustitución</h3>
+            <button class="modal-close" data-close="modal-cambio">&times;</button>
+          </div>
+          <form id="form-cambio">
+            <div class="form-group">
+              <label for="cambio-tipo">Tipo de Máquina</label>
+              <select id="cambio-tipo" required>
+                <option value="">Seleccionar…</option>
+                <option value="Viña">Máquina Viña</option>
+                <option value="Pesadora">Pesadora</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="cambio-maquina">Máquina</label>
+              <select id="cambio-maquina" required>
+                <option value="">Seleccionar máquina…</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="cambio-componente">Componente sustituido</label>
+              <input type="text" id="cambio-componente" required placeholder="Ej: Rodamiento principal" />
+            </div>
+            <div class="form-group">
+              <label for="cambio-tecnico">Técnico</label>
+              <input type="text" id="cambio-tecnico" required placeholder="Nombre del técnico" />
+            </div>
+            <div class="form-group">
+              <label for="cambio-fecha">Fecha del Cambio</label>
+              <input type="date" id="cambio-fecha" required />
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn" data-close="modal-cambio">Cancelar</button>
+              <button type="submit" class="btn btn-primary">Registrar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <label for="filtro-tipo-hist">Filtrar por tipo:</label>
+        <select id="filtro-tipo-hist">
+          <option value="">Todos</option>
+          <option value="Viña">Viña</option>
+          <option value="Pesadora">Pesadora</option>
+        </select>
+      </div>
+      <div id="lista-historial" class="table-wrapper">
+        <p class="empty-msg">No hay registros de sustituciones.</p>
+      </div>
+    </section>
+
+    <!-- ===== MODAL LOGIN ===== -->
+    <div id="modal-login" class="modal hidden">
+      <div class="modal-content modal-sm">
+        <div class="modal-header">
+          <h3>Iniciar Sesión</h3>
+          <button class="modal-close" data-close="modal-login">&times;</button>
+        </div>
+        <form id="form-login">
+          <div class="form-group">
+            <label for="login-email">Email</label>
+            <input type="email" id="login-email" required placeholder="tu@email.com" />
+          </div>
+          <div class="form-group">
+            <label for="login-password">Contraseña</label>
+            <input type="password" id="login-password" required placeholder="••••••••" />
+          </div>
+          <p id="login-error" class="error-msg hidden"></p>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-full">Entrar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Toast notifications -->
+    <div id="toast-container" class="toast-container"></div>
+  </main>
+
+  <!-- Firebase SDKs (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
