@@ -80,20 +80,39 @@
     btn.addEventListener('click', () => closeModal(btn.dataset.close));
   });
 
-  // ---- Auth (Optional) ----
+  // ---- Auth (Required) ----
   let currentUser = null;
+  let dataLoaded = false;
+
+  function showApp() {
+    $('#login-screen').classList.add('hidden');
+    $('#app-container').classList.remove('hidden');
+    if (!dataLoaded) {
+      dataLoaded = true;
+      loadMaquinas();
+      loadDocs();
+      loadRecambios();
+      loadHistorial();
+    }
+  }
+
+  function showLogin() {
+    $('#login-screen').classList.remove('hidden');
+    $('#app-container').classList.add('hidden');
+  }
 
   auth.onAuthStateChanged((user) => {
     currentUser = user;
     if (user) {
+      showApp();
       $('#user-area').innerHTML = `
         <span style="font-size:.85rem;color:var(--color-texto-light)">${escapeHtml(user.email)}</span>
         <button id="btn-logout" class="btn btn-sm">Salir</button>
       `;
       $('#btn-logout').addEventListener('click', () => auth.signOut());
     } else {
-      $('#user-area').innerHTML = `<button id="btn-login" class="btn btn-sm">Iniciar Sesión</button>`;
-      $('#btn-login').addEventListener('click', () => openModal('modal-login'));
+      showLogin();
+      $('#user-area').innerHTML = '';
     }
   });
 
@@ -101,14 +120,44 @@
     e.preventDefault();
     const email = $('#login-email').value.trim();
     const password = $('#login-password').value;
+    const remember = $('#login-remember').checked;
     const errEl = $('#login-error');
+    const infoEl = $('#login-info');
     errEl.classList.add('hidden');
+    infoEl.classList.add('hidden');
+
+    const persistence = remember
+      ? firebase.auth.Auth.Persistence.LOCAL
+      : firebase.auth.Auth.Persistence.SESSION;
+
     try {
+      await auth.setPersistence(persistence);
       await auth.signInWithEmailAndPassword(email, password);
-      closeModal('modal-login');
-      showToast('Sesión iniciada', 'success');
     } catch (err) {
-      errEl.textContent = 'Credenciales incorrectas';
+      errEl.textContent = 'Email o contraseña incorrectos';
+      errEl.classList.remove('hidden');
+    }
+  });
+
+  $('#btn-forgot').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const email = $('#login-email').value.trim();
+    const errEl = $('#login-error');
+    const infoEl = $('#login-info');
+    errEl.classList.add('hidden');
+    infoEl.classList.add('hidden');
+
+    if (!email) {
+      errEl.textContent = 'Escribe tu email primero';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    try {
+      await auth.sendPasswordResetEmail(email);
+      infoEl.textContent = 'Se ha enviado un email para restablecer tu contraseña';
+      infoEl.classList.remove('hidden');
+    } catch (err) {
+      errEl.textContent = 'No se pudo enviar el email. Verifica la dirección.';
       errEl.classList.remove('hidden');
     }
   });
@@ -567,14 +616,5 @@
   };
 
   // ---- Init ----
-  loadMaquinas();
-  loadDocs();
-  loadRecambios();
-  loadHistorial();
-
-  // Login button (initial)
-  const btnLogin = $('#btn-login');
-  if (btnLogin) {
-    btnLogin.addEventListener('click', () => openModal('modal-login'));
-  }
+  // Data loading is triggered by auth.onAuthStateChanged when user logs in
 })();

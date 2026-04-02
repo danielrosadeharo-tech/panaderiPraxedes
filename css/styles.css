@@ -351,9 +351,60 @@ tbody tr:hover { background: rgba(245,222,179,.15); }
   font-size: .95rem;
 }
 
-/* ---------- Error ---------- */
+/* ---------- Error / Info ---------- */
 .error-msg { color: var(--color-danger); font-size: .85rem; margin-top: .5rem; }
 .error-msg.hidden { display: none; }
+.info-msg { color: var(--color-success); font-size: .85rem; margin-top: .5rem; }
+.info-msg.hidden { display: none; }
+
+/* ---------- Login Screen ---------- */
+.login-screen {
+  position: fixed; inset: 0;
+  background: linear-gradient(135deg, var(--color-madera) 0%, var(--color-madera-dark) 100%);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 500;
+  padding: 1rem;
+}
+.login-screen.hidden { display: none; }
+.login-box {
+  background: var(--color-blanco);
+  border-radius: var(--radius);
+  padding: 2.5rem 2rem;
+  width: 100%; max-width: 400px;
+  box-shadow: var(--shadow-md);
+  text-align: center;
+}
+.login-logo { font-size: 3rem; display: block; margin-bottom: .5rem; }
+.login-box h1 {
+  font-family: var(--font-serif);
+  color: var(--color-madera);
+  font-size: 1.8rem;
+  margin-bottom: .25rem;
+}
+.login-subtitle {
+  color: var(--color-texto-light);
+  font-size: .95rem;
+  margin-bottom: 1.5rem;
+}
+.login-box .form-group { text-align: left; }
+.login-options {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: .85rem; margin-bottom: .5rem;
+}
+.login-options a {
+  color: var(--color-madera);
+  font-weight: 500;
+}
+.login-options a:hover { text-decoration: underline; }
+.checkbox-label {
+  display: flex; align-items: center; gap: .35rem;
+  color: var(--color-texto-light); cursor: pointer;
+}
+.checkbox-label input { cursor: pointer; }
+
+/* ---------- App Container ---------- */
+.app-container { display: flex; min-height: 100vh; width: 100%; }
+.app-container.hidden { display: none; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 768px) {
