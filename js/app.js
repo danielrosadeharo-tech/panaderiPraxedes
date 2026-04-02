@@ -269,20 +269,11 @@
 
   $('#form-doc').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const file = $('#doc-archivo').files[0];
-    if (!file) return;
-
     const idMaqui   = $('#doc-maquina').value;
     const nombreDoc = $('#doc-nombre').value.trim();
+    const urlArchivo = $('#doc-url').value.trim();
 
-    showToast('Subiendo archivo…', 'info');
     try {
-      const ts = Date.now();
-      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-      const ref = storage.ref(`documentos/${ts}_${safeName}`);
-      const snap = await ref.put(file);
-      const urlArchivo = await snap.ref.getDownloadURL();
-
       await db.collection('documentacion').add({
         idMaqui,
         nombreDoc,
@@ -290,10 +281,10 @@
         fechaSubida: new Date().toISOString().split('T')[0],
       });
       closeModal('modal-doc');
-      showToast('Documento subido correctamente', 'success');
+      showToast('Documento añadido correctamente', 'success');
     } catch (err) {
-      console.error('Error al subir documento:', err);
-      showToast('Error al subir: ' + err.message, 'error');
+      console.error('Error al guardar documento:', err);
+      showToast('Error al guardar: ' + err.message, 'error');
     }
   });
 

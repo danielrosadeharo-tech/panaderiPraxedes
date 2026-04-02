@@ -5,7 +5,7 @@
 // Puedes encontrarlos en la consola de Firebase > Configuración del proyecto.
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCNo-C5SfrMZyfqLrj5DmlUt-5Uw_dR5J0",
+  apiKey: "AIzaSyCNo-C5SfrMZyfqLrj5DmlUt-5Uw_dR5J0",
   authDomain: "panaderia-praxedes.firebaseapp.com",
   projectId: "panaderia-praxedes",
   storageBucket: "panaderia-praxedes.firebasestorage.app",
@@ -16,6 +16,5 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-const db      = firebase.firestore();
-const storage = firebase.storage();
-const auth    = firebase.auth();
+const db   = firebase.firestore();
+const auth = firebase.auth();

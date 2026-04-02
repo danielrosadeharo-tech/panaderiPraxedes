@@ -127,14 +127,14 @@
     <section id="section-documentacion" class="section">
       <div class="section-header">
         <h2>Documentación</h2>
-        <button class="btn btn-primary" id="btn-add-doc">+ Subir Documento</button>
+        <button class="btn btn-primary" id="btn-add-doc">+ Añadir Documento</button>
       </div>
 
-      <!-- Modal: Subir Documento -->
+      <!-- Modal: Añadir Documento -->
       <div id="modal-doc" class="modal hidden">
         <div class="modal-content">
           <div class="modal-header">
-            <h3>Subir Documento</h3>
+            <h3>Añadir Documento</h3>
             <button class="modal-close" data-close="modal-doc">&times;</button>
           </div>
           <form id="form-doc">
@@ -149,12 +149,12 @@
               <input type="text" id="doc-nombre" required placeholder="Ej: Manual de Usuario - Amasadora X" />
             </div>
             <div class="form-group">
-              <label for="doc-archivo">Archivo (PDF / Imagen)</label>
-              <input type="file" id="doc-archivo" accept=".pdf,.png,.jpg,.jpeg,.webp" required />
+              <label for="doc-url">Enlace al documento (Google Drive, etc.)</label>
+              <input type="url" id="doc-url" required placeholder="https://drive.google.com/file/d/..." />
             </div>
             <div class="form-actions">
               <button type="button" class="btn" data-close="modal-doc">Cancelar</button>
-              <button type="submit" class="btn btn-primary">Subir</button>
+              <button type="submit" class="btn btn-primary">Guardar</button>
             </div>
           </form>
         </div>
@@ -311,7 +311,6 @@
   <!-- Firebase SDKs (compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/app.js"></script>
