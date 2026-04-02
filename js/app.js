@@ -159,8 +159,10 @@
   }
 
   function loadMaquinas() {
-    db.collection('maquinas').orderBy('nombre').onSnapshot((snap) => {
+    db.collection('maquinas').onSnapshot((snap) => {
+      console.log('onSnapshot maquinas:', snap.size, 'documentos');
       const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      console.log('Datos maquinas:', data);
       renderMaquinas(data);
       $('#stat-maquinas').textContent = data.length;
     }, (err) => {
@@ -189,7 +191,8 @@
         await db.collection('maquinas').doc(id).update(data);
         showToast('Máquina actualizada', 'success');
       } else {
-        await db.collection('maquinas').add(data);
+        const docRef = await db.collection('maquinas').add(data);
+        console.log('Máquina guardada con ID:', docRef.id);
         showToast('Máquina registrada', 'success');
       }
       closeModal('modal-maquina');
