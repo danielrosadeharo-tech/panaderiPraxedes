@@ -173,6 +173,9 @@ input, select, textarea {
 .badge-vina      { background: #FDEBD0; color: #A04000; }
 .badge-pesadora  { background: #D6EAF8; color: #1B4F72; }
 .badge-otros     { background: #E8DAEF; color: #6C3483; }
+.badge-ok        { background: #D5F5E3; color: #1E8449; }
+.badge-warning   { background: #FADBD8; color: #C0392B; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.7; } }
 
 .card-meta { font-size: .85rem; color: var(--color-texto-light); margin-bottom: .5rem; }
 .card-actions {

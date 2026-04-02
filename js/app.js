@@ -428,6 +428,17 @@
   // =============================================
   // HISTORIAL DE SUSTITUCIONES
   // =============================================
+  function getEstado(c) {
+    if (!c.fechaCambio || !c.diasRecordatorio) return { texto: '—', clase: '' };
+    const fechaCambio = new Date(c.fechaCambio + 'T00:00:00');
+    const diasPasados = Math.floor((Date.now() - fechaCambio.getTime()) / 86400000);
+    const diasRestantes = c.diasRecordatorio - diasPasados;
+    if (diasRestantes <= 0) {
+      return { texto: 'Necesita cambio', clase: 'badge-warning' };
+    }
+    return { texto: `Cambiado (${diasRestantes}d)`, clase: 'badge-ok' };
+  }
+
   function renderHistorial(cambios, filtroTipo) {
     const filtered = filtroTipo ? cambios.filter(c => c.tipoMaquina === filtroTipo) : cambios;
     const container = $('#lista-historial');
@@ -443,6 +454,7 @@
             <th>Tipo</th>
             <th>Máquina</th>
             <th>Componente</th>
+            <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -450,12 +462,14 @@
           ${filtered.map(c => {
             const maquina = maquinasCache.find(m => m.id === c.idMaqui);
             const maquiNombre = maquina ? maquina.nombre : '—';
+            const estado = getEstado(c);
             return `
               <tr>
                 <td>${formatDate(c.fechaCambio)}</td>
                 <td><span class="card-badge ${badgeClass(c.tipoMaquina)}">${escapeHtml(c.tipoMaquina)}</span></td>
                 <td>${escapeHtml(maquiNombre)}</td>
                 <td>${escapeHtml(c.componente)}</td>
+                <td><span class="card-badge ${estado.clase}">${estado.texto}</span></td>
                 <td><button class="btn btn-sm btn-danger" onclick="app.deleteCambio('${c.id}')">🗑️</button></td>
               </tr>`;
           }).join('')}
@@ -481,14 +495,18 @@
     }
     container.innerHTML = `
       <table>
-        <thead><tr><th>Fecha</th><th>Tipo</th><th>Componente</th></tr></thead>
+        <thead><tr><th>Fecha</th><th>Tipo</th><th>Componente</th><th>Estado</th></tr></thead>
         <tbody>
-          ${cambios.map(c => `
+          ${cambios.map(c => {
+            const estado = getEstado(c);
+            return `
             <tr>
               <td>${formatDate(c.fechaCambio)}</td>
               <td><span class="card-badge ${badgeClass(c.tipoMaquina)}">${escapeHtml(c.tipoMaquina || '—')}</span></td>
               <td>${escapeHtml(c.componente)}</td>
-            </tr>`).join('')}
+              <td><span class="card-badge ${estado.clase}">${estado.texto}</span></td>
+            </tr>`;
+          }).join('')}
         </tbody>
       </table>`;
   }
@@ -523,8 +541,9 @@
     const data = {
       tipoMaquina: $('#cambio-tipo').value,
       idMaqui:     $('#cambio-maquina').value,
-      componente:  $('#cambio-componente').value.trim(),
-      fechaCambio: $('#cambio-fecha').value,
+      componente:       $('#cambio-componente').value.trim(),
+      fechaCambio:      $('#cambio-fecha').value,
+      diasRecordatorio: parseInt($('#cambio-dias').value, 10) || 0,
     };
     try {
       await db.collection('historial_cambios').add(data);
