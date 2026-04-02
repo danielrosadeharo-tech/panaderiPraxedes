@@ -196,7 +196,6 @@
       <div class="card">
         <div class="card-header">
           <h3>${escapeHtml(m.nombre)}</h3>
-          <span class="card-badge ${badgeClass(m.tipo)}">${escapeHtml(m.tipo)}</span>
         </div>
         <p class="card-meta">Instalada: ${formatDate(m.fechaInstalacion)}</p>
         <div class="card-actions">
@@ -232,7 +231,6 @@
     const id = $('#maquina-id').value;
     const data = {
       nombre:           $('#maquina-nombre').value.trim(),
-      tipo:             $('#maquina-tipo').value,
       fechaInstalacion: $('#maquina-fecha').value,
     };
     try {
@@ -259,7 +257,6 @@
     const m = doc.data();
     $('#maquina-id').value = id;
     $('#maquina-nombre').value = m.nombre;
-    $('#maquina-tipo').value = m.tipo;
     $('#maquina-fecha').value = m.fechaInstalacion || '';
     $('#modal-maquina-title').textContent = 'Editar Máquina';
     openModal('modal-maquina');
