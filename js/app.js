@@ -535,14 +535,27 @@
                 <td>${escapeHtml(c.componente)}</td>
                 <td><span class="card-badge ${estado.clase}">${estado.texto}</span></td>
                 <td>
-                  <button class="btn btn-sm btn-secondary" onclick="app.editCambio('${c.id}')">✏️ Editar</button>
-                  <button class="btn btn-sm btn-danger" onclick="app.deleteCambio('${c.id}')">🗑️ Borrar</button>
+                  <button type="button" class="btn btn-sm btn-secondary" data-edit-cambio="${c.id}">✏️ Editar</button>
+                  <button type="button" class="btn btn-sm btn-danger" data-delete-cambio="${c.id}">🗑️ Borrar</button>
                 </td>
               </tr>`;
           }).join('')}
         </tbody>
       </table>`;
   }
+
+  $('#lista-historial').addEventListener('click', (event) => {
+    const editButton = event.target.closest('[data-edit-cambio]');
+    if (editButton) {
+      app.editCambio(editButton.dataset.editCambio);
+      return;
+    }
+    const deleteButton = event.target.closest('[data-delete-cambio]');
+    if (deleteButton) {
+      app.deleteCambio(deleteButton.dataset.deleteCambio);
+      return;
+    }
+  });
 
   let historialCache = [];
   function loadHistorial() {
