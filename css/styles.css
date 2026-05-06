@@ -231,6 +231,15 @@ tbody td {
 }
 tbody tr:hover { background: rgba(245,222,179,.15); }
 
+.historial-group {
+  margin-bottom: 1.5rem;
+}
+.historial-group h3 {
+  margin: 0 0 .75rem;
+  font-size: 1rem;
+  color: var(--color-madera);
+}
+
 /* ---------- Filter Bar ---------- */
 .filter-bar {
   display: flex; align-items: center; gap: .75rem;

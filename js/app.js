@@ -522,7 +522,10 @@
                 <td>${escapeHtml(c.elemento || '—')}</td>
                 <td>${escapeHtml(c.componente)}</td>
                 <td><span class="card-badge ${estado.clase}">${estado.texto}</span></td>
-                <td><button class="btn btn-sm btn-danger" onclick="app.deleteCambio('${c.id}')">🗑️</button></td>
+                <td>
+                  <button class="btn btn-sm btn-secondary" onclick="app.editCambio('${c.id}')">✏️ Editar</button>
+                  <button class="btn btn-sm btn-danger" onclick="app.deleteCambio('${c.id}')">🗑️ Borrar</button>
+                </td>
               </tr>`;
           }).join('')}
         </tbody>
@@ -567,11 +570,14 @@
 
   $('#btn-add-cambio').addEventListener('click', () => {
     $('#form-cambio').reset();
+    $('#cambio-id').value = '';
+    $('#modal-cambio .modal-header h3').textContent = 'Registrar Sustitución';
     openModal('modal-cambio');
   });
 
   $('#form-cambio').addEventListener('submit', async (e) => {
     e.preventDefault();
+    const cambioId = $('#cambio-id').value;
     const data = {
       idMaqui:          $('#cambio-maquina').value,
       componente:       $('#cambio-componente').value.trim(),
@@ -580,14 +586,33 @@
       diasRecordatorio: parseInt($('#cambio-dias').value, 10) || 0,
     };
     try {
-      await db.collection('historial_cambios').add(data);
+      if (cambioId) {
+        await db.collection('historial_cambios').doc(cambioId).update(data);
+        showToast('Sustitución actualizada', 'success');
+      } else {
+        await db.collection('historial_cambios').add(data);
+        showToast('Sustitución registrada', 'success');
+      }
       closeModal('modal-cambio');
-      showToast('Sustitución registrada', 'success');
     } catch (err) {
-      console.error('Error al registrar cambio:', err);
-      showToast('Error al registrar: ' + err.message, 'error');
+      console.error('Error al guardar cambio:', err);
+      showToast('Error al guardar: ' + err.message, 'error');
     }
   });
+
+  window.app.editCambio = async (id) => {
+    const doc = await db.collection('historial_cambios').doc(id).get();
+    if (!doc.exists) return;
+    const cambio = doc.data();
+    $('#cambio-id').value = id;
+    $('#cambio-maquina').value = cambio.idMaqui || '';
+    $('#cambio-componente').value = cambio.componente || '';
+    $('#cambio-elemento').value = cambio.elemento || '';
+    $('#cambio-fecha').value = cambio.fechaCambio || '';
+    $('#cambio-dias').value = cambio.diasRecordatorio || '';
+    $('#modal-cambio .modal-header h3').textContent = 'Editar Sustitución';
+    openModal('modal-cambio');
+  };
 
   window.app.deleteCambio = async (id) => {
     if (!confirm('¿Eliminar este registro?')) return;
@@ -693,23 +718,46 @@
       container.innerHTML = '<p class="empty-msg">No hay sustituciones para esta máquina.</p>';
       return;
     }
-    container.innerHTML = `
-      <table>
-        <thead><tr><th>Fecha</th><th>Elemento</th><th>Componente</th><th>Estado</th><th>Acciones</th></tr></thead>
-        <tbody>
-          ${filtered.map(c => {
-            const estado = getEstado(c);
-            return `
+
+    const grouped = filtered.reduce((acc, c) => {
+      const key = c.elemento?.trim() || 'Sin elemento';
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(c);
+      return acc;
+    }, {});
+
+    const keys = Object.keys(grouped).sort((a, b) => {
+      if (a === 'Sin elemento') return 1;
+      if (b === 'Sin elemento') return -1;
+      return a.localeCompare(b, 'es', { sensitivity: 'base' });
+    });
+
+    container.innerHTML = keys.map(key => {
+      const rows = grouped[key].map(c => {
+        const estado = getEstado(c);
+        return `
             <tr>
               <td>${formatDate(c.fechaCambio)}</td>
-              <td>${escapeHtml(c.elemento || '—')}</td>
               <td>${escapeHtml(c.componente)}</td>
               <td><span class="card-badge ${estado.clase}">${estado.texto}</span></td>
-              <td><button class="btn btn-sm btn-danger" onclick="app.deleteCambio('${c.id}')">🗑️</button></td>
+              <td>
+                <button class="btn btn-sm btn-secondary" onclick="app.editCambio('${c.id}')">✏️ Editar</button>
+                <button class="btn btn-sm btn-danger" onclick="app.deleteCambio('${c.id}')">🗑️ Borrar</button>
+              </td>
             </tr>`;
-          }).join('')}
-        </tbody>
-      </table>`;
+      }).join('');
+
+      return `
+        <div class="historial-group">
+          <h3>${escapeHtml(key)}</h3>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Fecha</th><th>Componente</th><th>Estado</th><th>Acciones</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </div>`;
+    }).join('');
   }
 
   // Back button
