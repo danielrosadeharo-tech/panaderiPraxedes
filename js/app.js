@@ -288,7 +288,7 @@
   function getPreviewUrl(urlArchivo) {
     const driveId = extractGoogleDriveId(urlArchivo);
     if (driveId) {
-      return `https://drive.google.com/file/d/${driveId}/preview`;
+      return `https://drive.google.com/file/d/${driveId}/view`;
     }
     return urlArchivo;
   }
@@ -324,12 +324,8 @@
       const docId = previewButton.dataset.previewDoc;
       const doc = docsCache.find(d => d.id === docId);
       if (doc) {
-        $('#preview-title').textContent = escapeHtml(doc.nombreDoc);
-        $('#preview-download-btn').href = escapeHtml(doc.urlArchivo);
-        const previewContainer = $('#preview-container');
         const previewUrl = getPreviewUrl(doc.urlArchivo);
-        previewContainer.innerHTML = `<iframe src="${escapeHtml(previewUrl)}" style="width: 100%; height: 100%; border: none;"></iframe>`;
-        openModal('modal-preview');
+        window.open(previewUrl, '_blank', 'noopener,noreferrer');
       }
       return;
     }
@@ -761,12 +757,8 @@
       const docId = previewButton.dataset.previewDoc;
       const doc = docsCache.find(d => d.id === docId);
       if (doc) {
-        $('#preview-title').textContent = escapeHtml(doc.nombreDoc);
-        $('#preview-download-btn').href = escapeHtml(doc.urlArchivo);
-        const previewContainer = $('#preview-container');
         const previewUrl = getPreviewUrl(doc.urlArchivo);
-        previewContainer.innerHTML = `<iframe src="${escapeHtml(previewUrl)}" style="width: 100%; height: 100%; border: none;"></iframe>`;
-        openModal('modal-preview');
+        window.open(previewUrl, '_blank', 'noopener,noreferrer');
       }
       return;
     }
