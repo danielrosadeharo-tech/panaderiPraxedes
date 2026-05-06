@@ -354,6 +354,9 @@ tbody tr:hover { background: rgba(245,222,179,.15); }
 }
 .modal-close:hover { color: var(--color-danger); }
 .modal-content form { padding: 1.5rem; }
+.modal-footer {
+  display: flex; gap: 1rem; flex-wrap: wrap;
+}
 
 /* ---------- Toast ---------- */
 .toast-container {

@@ -273,6 +273,26 @@
   // =============================================
   // DOCUMENTACIÓN
   // =============================================
+  function extractGoogleDriveId(url) {
+    const patterns = [
+      /\/d\/([a-zA-Z0-9-_]+)/,
+      /id=([a-zA-Z0-9-_]+)/,
+    ];
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match) return match[1];
+    }
+    return null;
+  }
+
+  function getPreviewUrl(urlArchivo) {
+    const driveId = extractGoogleDriveId(urlArchivo);
+    if (driveId) {
+      return `https://drive.google.com/file/d/${driveId}/preview`;
+    }
+    return urlArchivo;
+  }
+
   function renderDocs(docs) {
     const container = $('#lista-docs');
     if (!docs.length) {
@@ -290,12 +310,35 @@
           <p class="card-meta">Máquina: ${escapeHtml(maquiNombre)}</p>
           <p class="card-meta">Subido: ${formatDate(d.fechaSubida)}</p>
           <div class="card-actions">
-            <a href="${escapeHtml(d.urlArchivo)}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary">📥 Descargar</a>
-            <button class="btn btn-sm btn-danger" onclick="app.deleteDoc('${d.id}')">🗑️ Eliminar</button>
+            <button type="button" class="btn btn-sm btn-primary" data-preview-doc="${d.id}">👁️ Ver Preview</button>
+            <a href="${escapeHtml(d.urlArchivo)}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary">📥 Descargar</a>
+            <button type="button" class="btn btn-sm btn-danger" data-delete-doc="${d.id}">🗑️ Eliminar</button>
           </div>
         </div>`;
     }).join('');
   }
+
+  $('#lista-docs').addEventListener('click', (event) => {
+    const previewButton = event.target.closest('[data-preview-doc]');
+    if (previewButton) {
+      const docId = previewButton.dataset.previewDoc;
+      const doc = docsCache.find(d => d.id === docId);
+      if (doc) {
+        $('#preview-title').textContent = escapeHtml(doc.nombreDoc);
+        $('#preview-download-btn').href = escapeHtml(doc.urlArchivo);
+        const previewContainer = $('#preview-container');
+        const previewUrl = getPreviewUrl(doc.urlArchivo);
+        previewContainer.innerHTML = `<iframe src="${escapeHtml(previewUrl)}" style="width: 100%; height: 100%; border: none;"></iframe>`;
+        openModal('modal-preview');
+      }
+      return;
+    }
+    const deleteButton = event.target.closest('[data-delete-doc]');
+    if (deleteButton) {
+      app.deleteDoc(deleteButton.dataset.deleteDoc);
+      return;
+    }
+  });
 
   let docsCache = [];
   function loadDocs() {
@@ -705,11 +748,34 @@
         <div class="card-header"><h3>${escapeHtml(d.nombreDoc)}</h3></div>
         <p class="card-meta">Subido: ${formatDate(d.fechaSubida)}</p>
         <div class="card-actions">
-          <a href="${escapeHtml(d.urlArchivo)}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary">📥 Abrir</a>
-          <button class="btn btn-sm btn-danger" onclick="app.deleteDoc('${d.id}')">🗑️</button>
+          <button type="button" class="btn btn-sm btn-primary" data-preview-doc="${d.id}">👁️ Ver Preview</button>
+          <a href="${escapeHtml(d.urlArchivo)}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary">📥 Descargar</a>
+          <button type="button" class="btn btn-sm btn-danger" data-delete-doc="${d.id}">🗑️</button>
         </div>
       </div>`).join('');
   }
+
+  $('#detalle-docs').addEventListener('click', (event) => {
+    const previewButton = event.target.closest('[data-preview-doc]');
+    if (previewButton) {
+      const docId = previewButton.dataset.previewDoc;
+      const doc = docsCache.find(d => d.id === docId);
+      if (doc) {
+        $('#preview-title').textContent = escapeHtml(doc.nombreDoc);
+        $('#preview-download-btn').href = escapeHtml(doc.urlArchivo);
+        const previewContainer = $('#preview-container');
+        const previewUrl = getPreviewUrl(doc.urlArchivo);
+        previewContainer.innerHTML = `<iframe src="${escapeHtml(previewUrl)}" style="width: 100%; height: 100%; border: none;"></iframe>`;
+        openModal('modal-preview');
+      }
+      return;
+    }
+    const deleteButton = event.target.closest('[data-delete-doc]');
+    if (deleteButton) {
+      app.deleteDoc(deleteButton.dataset.deleteDoc);
+      return;
+    }
+  });
 
   function renderDetalleRecambios(maquinaId) {
     const filtered = recambiosCache.filter(r => r.idMaqui === maquinaId);
