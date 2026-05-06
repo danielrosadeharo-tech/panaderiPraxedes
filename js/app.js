@@ -737,10 +737,10 @@
         const estado = getEstado(c);
         return `
             <tr>
-              <td>${formatDate(c.fechaCambio)}</td>
+              <td style="width: 110px; white-space: nowrap;">${formatDate(c.fechaCambio)}</td>
               <td>${escapeHtml(c.componente)}</td>
-              <td><span class="card-badge ${estado.clase}">${estado.texto}</span></td>
-              <td>
+              <td style="width: 140px; text-align: center;"><span class="card-badge ${estado.clase}">${estado.texto}</span></td>
+              <td style="width: 180px; text-align: right;">
                 <button class="btn btn-sm btn-secondary" onclick="app.editCambio('${c.id}')">✏️ Editar</button>
                 <button class="btn btn-sm btn-danger" onclick="app.deleteCambio('${c.id}')">🗑️ Borrar</button>
               </td>
@@ -752,7 +752,7 @@
           <h3>${escapeHtml(key)}</h3>
           <div class="table-wrapper">
             <table>
-              <thead><tr><th>Fecha</th><th>Componente</th><th>Estado</th><th>Acciones</th></tr></thead>
+              <thead><tr><th style="width: 110px;">Fecha</th><th>Componente</th><th style="width: 140px; text-align: center;">Estado</th><th style="width: 180px; text-align: right;">Acciones</th></tr></thead>
               <tbody>${rows}</tbody>
             </table>
           </div>
