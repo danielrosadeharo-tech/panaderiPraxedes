@@ -372,14 +372,15 @@
           ${filtered.map(r => {
             const maquina = maquinasCache.find(m => m.id === r.idMaqui);
             const maquiNombre = maquina ? maquina.nombre : '—';
+            const rowClass = r.stock === 0 ? ' class="row-danger"' : r.stock === 1 ? ' class="row-warning"' : '';
             return `
-              <tr>
+              <tr${rowClass}>
                 <td><strong>${escapeHtml(r.pieza)}</strong></td>
                 <td>${escapeHtml(maquiNombre)}</td>
                 <td>
                   <div class="stock-controls">
                     <button class="btn-icon" onclick="app.updateStock('${r.id}', -1)" title="Restar">➖</button>
-                    <span class="stock-value${r.stock === 0 ? ' stock-danger' : r.stock === 1 ? ' stock-warning' : ''}">${r.stock}</span>
+                    <span class="stock-value">${r.stock}</span>
                     <button class="btn-icon" onclick="app.updateStock('${r.id}', 1)" title="Sumar">➕</button>
                   </div>
                 </td>
@@ -503,6 +504,7 @@
           <tr>
             <th>Fecha</th>
             <th>Máquina</th>
+            <th>Elemento</th>
             <th>Componente</th>
             <th>Estado</th>
             <th>Acciones</th>
@@ -517,6 +519,7 @@
               <tr>
                 <td>${formatDate(c.fechaCambio)}</td>
                 <td>${escapeHtml(maquiNombre)}</td>
+                <td>${escapeHtml(c.elemento || '—')}</td>
                 <td>${escapeHtml(c.componente)}</td>
                 <td><span class="card-badge ${estado.clase}">${estado.texto}</span></td>
                 <td><button class="btn btn-sm btn-danger" onclick="app.deleteCambio('${c.id}')">🗑️</button></td>
@@ -572,6 +575,7 @@
     const data = {
       idMaqui:          $('#cambio-maquina').value,
       componente:       $('#cambio-componente').value.trim(),
+      elemento:         $('#cambio-elemento').value.trim(),
       fechaCambio:      $('#cambio-fecha').value,
       diasRecordatorio: parseInt($('#cambio-dias').value, 10) || 0,
     };
@@ -691,13 +695,14 @@
     }
     container.innerHTML = `
       <table>
-        <thead><tr><th>Fecha</th><th>Componente</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <thead><tr><th>Fecha</th><th>Elemento</th><th>Componente</th><th>Estado</th><th>Acciones</th></tr></thead>
         <tbody>
           ${filtered.map(c => {
             const estado = getEstado(c);
             return `
             <tr>
               <td>${formatDate(c.fechaCambio)}</td>
+              <td>${escapeHtml(c.elemento || '—')}</td>
               <td>${escapeHtml(c.componente)}</td>
               <td><span class="card-badge ${estado.clase}">${estado.texto}</span></td>
               <td><button class="btn btn-sm btn-danger" onclick="app.deleteCambio('${c.id}')">🗑️</button></td>

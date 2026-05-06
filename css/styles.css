@@ -342,8 +342,15 @@ tbody tr:hover { background: rgba(245,222,179,.15); }
   font-weight: 600;
   font-size: 1rem;
 }
-.stock-value.stock-danger { color: #d32f2f; }
-.stock-value.stock-warning { color: #e65100; }
+tr.row-danger td,
+tr.row-danger td strong,
+tr.row-danger td .stock-value { color: #d32f2f !important; font-weight: 600; }
+tr.row-danger { background: rgba(211,47,47,.08); }
+
+tr.row-warning td,
+tr.row-warning td strong,
+tr.row-warning td .stock-value { color: #e65100 !important; font-weight: 600; }
+tr.row-warning { background: rgba(230,81,0,.08); }
 
 /* ---------- Empty State ---------- */
 .empty-msg {
