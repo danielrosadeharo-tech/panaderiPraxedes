@@ -482,6 +482,7 @@
   // HISTORIAL DE SUSTITUCIONES
   // =============================================
   function getEstado(c) {
+    if (c.sinRecordatorio) return { texto: 'Sin recordatorio', clase: 'badge-muted' };
     if (!c.fechaCambio || !c.diasRecordatorio) return { texto: '—', clase: '' };
     const fechaCambio = new Date(c.fechaCambio + 'T00:00:00');
     const diasPasados = Math.floor((Date.now() - fechaCambio.getTime()) / 86400000);
@@ -491,6 +492,17 @@
     }
     return { texto: `Cambiado (${diasRestantes}d)`, clase: 'badge-ok' };
   }
+
+  function updateRecordatorioState() {
+    const diasInput = $('#cambio-dias');
+    const noRecordar = $('#cambio-no-recordar').checked;
+    diasInput.disabled = noRecordar;
+    diasInput.required = !noRecordar;
+    diasInput.placeholder = noRecordar ? 'Sin recordatorio' : 'Ej: 90 (cada 90 días)';
+    if (noRecordar) diasInput.value = '';
+  }
+
+  $('#cambio-no-recordar').addEventListener('change', updateRecordatorioState);
 
   function renderHistorial(cambios) {
     const container = $('#lista-historial');
@@ -571,6 +583,8 @@
   $('#btn-add-cambio').addEventListener('click', () => {
     $('#form-cambio').reset();
     $('#cambio-id').value = '';
+    $('#cambio-no-recordar').checked = false;
+    updateRecordatorioState();
     $('#modal-cambio .modal-header h3').textContent = 'Registrar Sustitución';
     openModal('modal-cambio');
   });
@@ -578,12 +592,14 @@
   $('#form-cambio').addEventListener('submit', async (e) => {
     e.preventDefault();
     const cambioId = $('#cambio-id').value;
+    const sinRecordatorio = $('#cambio-no-recordar').checked;
     const data = {
       idMaqui:          $('#cambio-maquina').value,
       componente:       $('#cambio-componente').value.trim(),
       elemento:         $('#cambio-elemento').value.trim(),
       fechaCambio:      $('#cambio-fecha').value,
-      diasRecordatorio: parseInt($('#cambio-dias').value, 10) || 0,
+      sinRecordatorio,
+      diasRecordatorio: sinRecordatorio ? 0 : parseInt($('#cambio-dias').value, 10) || 0,
     };
     try {
       if (cambioId) {
@@ -609,7 +625,9 @@
     $('#cambio-componente').value = cambio.componente || '';
     $('#cambio-elemento').value = cambio.elemento || '';
     $('#cambio-fecha').value = cambio.fechaCambio || '';
-    $('#cambio-dias').value = cambio.diasRecordatorio || '';
+    $('#cambio-no-recordar').checked = Boolean(cambio.sinRecordatorio);
+    $('#cambio-dias').value = cambio.sinRecordatorio ? '' : (cambio.diasRecordatorio || '');
+    updateRecordatorioState();
     $('#modal-cambio .modal-header h3').textContent = 'Editar Sustitución';
     openModal('modal-cambio');
   };
