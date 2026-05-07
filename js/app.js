@@ -325,7 +325,22 @@
       const doc = docsCache.find(d => d.id === docId);
       if (doc) {
         const previewUrl = getPreviewUrl(doc.urlArchivo);
-        window.open(previewUrl, '_blank', 'noopener,noreferrer');
+        // Validar si es un enlace de Google Drive o un enlace válido
+        if (!doc.urlArchivo || typeof doc.urlArchivo !== 'string' || !/^https?:\/\//.test(doc.urlArchivo)) {
+          showToast('El enlace del documento no es válido.', 'error');
+          return;
+        }
+        // Si es de Google Drive, abrir en modo preview
+        if (/drive\.google\.com/.test(doc.urlArchivo)) {
+          window.open(previewUrl, '_blank', 'noopener,noreferrer');
+        } else {
+          // Si no es de Drive, preguntar si desea continuar
+          if (confirm('El enlace no es de Google Drive. ¿Deseas intentar abrirlo igualmente?')) {
+            window.open(doc.urlArchivo, '_blank', 'noopener,noreferrer');
+          }
+        }
+      } else {
+        showToast('No se encontró el documento.', 'error');
       }
       return;
     }
@@ -758,7 +773,19 @@
       const doc = docsCache.find(d => d.id === docId);
       if (doc) {
         const previewUrl = getPreviewUrl(doc.urlArchivo);
-        window.open(previewUrl, '_blank', 'noopener,noreferrer');
+        if (!doc.urlArchivo || typeof doc.urlArchivo !== 'string' || !/^https?:\/\//.test(doc.urlArchivo)) {
+          showToast('El enlace del documento no es válido.', 'error');
+          return;
+        }
+        if (/drive\.google\.com/.test(doc.urlArchivo)) {
+          window.open(previewUrl, '_blank', 'noopener,noreferrer');
+        } else {
+          if (confirm('El enlace no es de Google Drive. ¿Deseas intentar abrirlo igualmente?')) {
+            window.open(doc.urlArchivo, '_blank', 'noopener,noreferrer');
+          }
+        }
+      } else {
+        showToast('No se encontró el documento.', 'error');
       }
       return;
     }
