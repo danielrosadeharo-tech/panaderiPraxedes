@@ -621,11 +621,24 @@
 
   // ---- cambio-maquina is populated from maquinasCache via populateMachineSelects ----
 
+  function fillElementosDatalist(maquinaId) {
+    // Obtener elementos únicos usados en historial para la máquina seleccionada
+    const elementos = historialCache
+      .filter(c => c.idMaqui === maquinaId && c.elemento && c.elemento.trim() !== '')
+      .map(c => c.elemento.trim())
+      .filter((v, i, arr) => arr.indexOf(v) === i)
+      .sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+    const datalist = document.getElementById('elementos-maquina-list');
+    datalist.innerHTML = elementos.map(e => `<option value="${escapeHtml(e)}">`).join('');
+  }
+
   $('#btn-add-cambio').addEventListener('click', () => {
     $('#form-cambio').reset();
     $('#cambio-id').value = '';
     $('#cambio-no-recordar').checked = false;
     updateRecordatorioState();
+    // Llenar datalist según la máquina seleccionada
+    fillElementosDatalist($('#cambio-maquina').value);
     $('#modal-cambio .modal-header h3').textContent = 'Registrar Sustitución';
     openModal('modal-cambio');
   });
@@ -669,9 +682,15 @@
     $('#cambio-no-recordar').checked = Boolean(cambio.sinRecordatorio);
     $('#cambio-dias').value = cambio.sinRecordatorio ? '' : (cambio.diasRecordatorio || '');
     updateRecordatorioState();
+    // Llenar datalist según la máquina seleccionada
+    fillElementosDatalist($('#cambio-maquina').value);
     $('#modal-cambio .modal-header h3').textContent = 'Editar Sustitución';
     openModal('modal-cambio');
   };
+  // Actualizar datalist de elementos al cambiar la máquina seleccionada en el formulario de cambio
+  $('#cambio-maquina').addEventListener('change', function() {
+    fillElementosDatalist(this.value);
+  });
 
   window.app.deleteCambio = async (id) => {
     if (!confirm('¿Eliminar este registro?')) return;
