@@ -310,7 +310,6 @@
           <p class="card-meta">Máquina: ${escapeHtml(maquiNombre)}</p>
           <p class="card-meta">Subido: ${formatDate(d.fechaSubida)}</p>
           <div class="card-actions">
-            <button type="button" class="btn btn-sm btn-primary" data-preview-doc="${d.id}">👁️ Ver Preview</button>
             <a href="${escapeHtml(d.urlArchivo)}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary">📥 Descargar</a>
             <button type="button" class="btn btn-sm btn-danger" data-delete-doc="${d.id}">🗑️ Eliminar</button>
           </div>
@@ -319,37 +318,6 @@
   }
 
   $('#lista-docs').addEventListener('click', (event) => {
-    const previewButton = event.target.closest('[data-preview-doc]');
-    if (previewButton) {
-      const docId = previewButton.dataset.previewDoc;
-      const doc = docsCache.find(d => d.id === docId);
-      if (doc) {
-        const previewUrl = getPreviewUrl(doc.urlArchivo);
-        // Validar si es un enlace de Google Drive o un enlace válido
-        if (!doc.urlArchivo || typeof doc.urlArchivo !== 'string' || !/^https?:\/\//.test(doc.urlArchivo)) {
-          showToast('El enlace del documento no es válido.', 'error');
-          return;
-        }
-        // Si es de Google Drive, abrir en modo preview
-        if (/drive\.google\.com/.test(doc.urlArchivo)) {
-          const win = window.open(previewUrl, '_blank', 'noopener,noreferrer');
-          if (!win) {
-            showToast('El navegador ha bloqueado la ventana emergente. Permite los popups para este sitio.', 'error');
-          }
-        } else {
-          // Si no es de Drive, preguntar si desea continuar
-          if (confirm('El enlace no es de Google Drive. ¿Deseas intentar abrirlo igualmente?')) {
-            const win = window.open(doc.urlArchivo, '_blank', 'noopener,noreferrer');
-            if (!win) {
-              showToast('El navegador ha bloqueado la ventana emergente. Permite los popups para este sitio.', 'error');
-            }
-          }
-        }
-      } else {
-        showToast('No se encontró el documento.', 'error');
-      }
-      return;
-    }
     const deleteButton = event.target.closest('[data-delete-doc]');
     if (deleteButton) {
       app.deleteDoc(deleteButton.dataset.deleteDoc);
@@ -765,7 +733,6 @@
         <div class="card-header"><h3>${escapeHtml(d.nombreDoc)}</h3></div>
         <p class="card-meta">Subido: ${formatDate(d.fechaSubida)}</p>
         <div class="card-actions">
-          <button type="button" class="btn btn-sm btn-primary" data-preview-doc="${d.id}">👁️ Ver Preview</button>
           <a href="${escapeHtml(d.urlArchivo)}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary">📥 Descargar</a>
           <button type="button" class="btn btn-sm btn-danger" data-delete-doc="${d.id}">🗑️</button>
         </div>
@@ -773,28 +740,6 @@
   }
 
   $('#detalle-docs').addEventListener('click', (event) => {
-    const previewButton = event.target.closest('[data-preview-doc]');
-    if (previewButton) {
-      const docId = previewButton.dataset.previewDoc;
-      const doc = docsCache.find(d => d.id === docId);
-      if (doc) {
-        const previewUrl = getPreviewUrl(doc.urlArchivo);
-        if (!doc.urlArchivo || typeof doc.urlArchivo !== 'string' || !/^https?:\/\//.test(doc.urlArchivo)) {
-          showToast('El enlace del documento no es válido.', 'error');
-          return;
-        }
-        if (/drive\.google\.com/.test(doc.urlArchivo)) {
-          window.open(previewUrl, '_blank', 'noopener,noreferrer');
-        } else {
-          if (confirm('El enlace no es de Google Drive. ¿Deseas intentar abrirlo igualmente?')) {
-            window.open(doc.urlArchivo, '_blank', 'noopener,noreferrer');
-          }
-        }
-      } else {
-        showToast('No se encontró el documento.', 'error');
-      }
-      return;
-    }
     const deleteButton = event.target.closest('[data-delete-doc]');
     if (deleteButton) {
       app.deleteDoc(deleteButton.dataset.deleteDoc);
