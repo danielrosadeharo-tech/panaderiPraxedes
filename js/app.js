@@ -332,11 +332,17 @@
         }
         // Si es de Google Drive, abrir en modo preview
         if (/drive\.google\.com/.test(doc.urlArchivo)) {
-          window.open(previewUrl, '_blank', 'noopener,noreferrer');
+          const win = window.open(previewUrl, '_blank', 'noopener,noreferrer');
+          if (!win) {
+            showToast('El navegador ha bloqueado la ventana emergente. Permite los popups para este sitio.', 'error');
+          }
         } else {
           // Si no es de Drive, preguntar si desea continuar
           if (confirm('El enlace no es de Google Drive. ¿Deseas intentar abrirlo igualmente?')) {
-            window.open(doc.urlArchivo, '_blank', 'noopener,noreferrer');
+            const win = window.open(doc.urlArchivo, '_blank', 'noopener,noreferrer');
+            if (!win) {
+              showToast('El navegador ha bloqueado la ventana emergente. Permite los popups para este sitio.', 'error');
+            }
           }
         }
       } else {
