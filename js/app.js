@@ -869,6 +869,14 @@
       $('#doc-maquina').parentElement.style.display = 'none';
     }
     openModal('modal-doc');
+    // Forzar repaint y foco al modal
+    setTimeout(() => {
+      const modal = document.getElementById('modal-doc');
+      if (modal) {
+        modal.scrollIntoView({behavior: 'smooth', block: 'center'});
+        modal.focus && modal.focus();
+      }
+    }, 50);
   });
   $('#btn-add-recambio-detalle').addEventListener('click', () => {
     $('#form-recambio').reset();
