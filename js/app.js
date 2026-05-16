@@ -337,6 +337,9 @@
 
   $('#btn-add-doc').addEventListener('click', () => {
     $('#form-doc').reset();
+    // Mostrar y habilitar el select de máquina
+    $('#doc-maquina').removeAttribute('disabled');
+    $('#doc-maquina').parentElement.style.display = '';
     openModal('modal-doc');
   });
 
@@ -855,7 +858,11 @@
   // Add buttons from detail view
   $('#btn-add-doc-detalle').addEventListener('click', () => {
     $('#form-doc').reset();
-    $('#doc-maquina').value = currentMaquinaId;
+    if (currentMaquinaId) {
+      $('#doc-maquina').value = currentMaquinaId;
+      $('#doc-maquina').setAttribute('disabled', 'disabled');
+      $('#doc-maquina').parentElement.style.display = 'none';
+    }
     openModal('modal-doc');
   });
   $('#btn-add-recambio-detalle').addEventListener('click', () => {
