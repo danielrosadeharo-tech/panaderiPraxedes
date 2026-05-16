@@ -64,9 +64,14 @@
     $('#sidebar').classList.remove('open');
   }
 
+  // Cierra cualquier modal abierto al cambiar de sección
+  function closeAllModals() {
+    document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
+  }
   navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
+      closeAllModals();
       navigateTo(link.dataset.section);
     });
   });
